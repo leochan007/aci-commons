@@ -1,0 +1,24 @@
+{
+  "name": "alphacarinquiry-commons",
+  "version": "0.0.19",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/AlphaCarIO/aci-commons.git"
+  },
+  "author": "leo chan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AlphaCarIO/aci-commons/issues"
+  },
+  "homepage": "https://github.com/AlphaCarIO/aci-commons#readme",
+  "dependencies": {
+    "alphacarinquiry-commons": "../aci-commons",
+    "mongoose": "^5.3.14",
+    "socket.io": "^2.2.0"
+  }
+}
