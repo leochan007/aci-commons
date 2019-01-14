@@ -15,7 +15,13 @@ class MongoDb {
         this.db_name = '';
       }
     }
-    let url = ACIConfig.mongodb_url + (this.db_name == '' ? '' : '/' + this.db_name) + ACIConfig.mongodb_opt_str;
+    let url = ACIConfig.mongodb_url + (this.db_name == '' ? '' : 
+    (ACIConfig.mongodb_url.endsWith('/') ? this.db_name : '/' + this.db_name)) + ACIConfig.mongodb_opt_str;
+
+    console.log('ACIConfig:', JSON.stringify(ACIConfig));
+    console.log('db_name:', db_name);
+    console.log('db url:', url);
+
     this.db.connect(url, ACIConfig.mongo_opt);
 
     console.log('try to connect to ' + this.db_name + ' !');
