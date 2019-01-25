@@ -247,7 +247,7 @@ function genResponse(ctx, error_code, error_msg, data) {
   let body = {
     'error_code': error_code,
     'error_msg': error_msg,
-    data: data,
+    'data': data,
   }
 
   ctx.response.body = body

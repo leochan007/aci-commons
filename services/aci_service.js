@@ -157,6 +157,48 @@ async function getCreditInquiryList(ctx) {
 
 }
 
+async function getCountGroupByMoralCrisisType(ctx) {
+
+  let cond = [{
+      '$match': {
+        'status': {
+          $ne: States.STATE_DELETED
+        }
+      }
+    }, {
+      '$group': {
+        '_id': '$moralCrisisType',
+        'count': {
+          '$sum': 1
+        }
+      }
+    },
+    {
+      '$sort': {
+        'count': 1,
+        '_id': 1
+      }
+    },
+  ]
+
+  let error_code = RetCode.RET_OK;
+  let error_msg = RetCode.ERRMSG_EMPTY;
+  let txs_count = [];
+
+  try {
+
+    txs_count = await CreditInquiryModel.aggregate(cond).exec();
+
+  } catch (err) {
+    console.log(err);
+    error_code = RetCode.RET_QUERY_FAILED;
+    error_msg = RetCode.ERRMSG_QUERY_FAILED;
+  }
+
+  service_helper.genResponse(ctx, error_code, error_msg, {'txs_count': txs_count});
+
+}
+
 async function getCreditInquiryTxCountList(ctx) {
   let dates = ctx.request.body;
   let date_arr = [];
@@ -226,20 +268,14 @@ async function getCreditInquiryTxCountList(ctx) {
     error_msg = RetCode.ERRMSG_QUERY_FAILED;
   }
 
-  let body = {
-    'error_code': error_code,
-    'error_msg': error_msg,
-    data: {
-      'txs_count': final_res,
-    }
-  }
+  service_helper.genResponse(ctx, error_code, error_msg, {'txs_count': final_res});
 
-  ctx.response.body = body
 }
 
 module.exports = {
   getLatestCreditInquiry,
   getCreditInquiryByHash,
+  getCountGroupByMoralCrisisType,
   getCreditInquiryListByMoralCrisisType,
   getCreditInquiryList,
   getCreditInquiryTxCountList,
