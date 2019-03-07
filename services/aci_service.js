@@ -162,7 +162,7 @@ async function getCountGroupByMoralCrisisType(ctx) {
   let cond = [{
       '$match': {
         'status': {
-          $ne: States.STATE_DELETED
+          '$ne': States.STATE_DELETED
         }
       }
     }, {
