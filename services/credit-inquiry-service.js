@@ -20,7 +20,7 @@ alphacar.db.connection.on('close', () => {
 
 const CreditInquiryModel = alphacar.db.model('credit_inquiry', CreditInquirySchema, 'credit_inquiry');
 
-const service_helper = require('../utils/service_helper');
+const service_helper = require('../utils/ci_service_helper');
 
 async function getLatestCreditInquiry(ctx) {
 

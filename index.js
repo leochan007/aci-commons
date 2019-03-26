@@ -12,7 +12,8 @@ const States = require('./def/record-state');
 const RetCode = require('./def/ret-code');
 const ACIConfig = require('./config/config');
 const { MongoDb } = require('./utils/mongo_helper');
-const aciService = require('./services/aci_service');
+const ciService = require('./services/credit-inquiry-service');
+const rrService = require('./services/reward-record-service');
 
 const io = require('./utils/io');
 
@@ -25,6 +26,7 @@ module.exports = {
   RetCode,
   ACIConfig,
   MongoDb,
-  aciService,
+  ciService,
+  rrService,
   io,
 }
