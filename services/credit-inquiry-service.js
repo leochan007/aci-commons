@@ -20,6 +20,7 @@ alphacar.db.connection.on('close', () => {
 
 const CreditInquiryModel = alphacar.db.model('credit_inquiry', CreditInquirySchema, 'credit_inquiry');
 
+const common_service_helper = require('../utils/service_helper');
 const service_helper = require('../utils/ci_service_helper');
 
 async function getLatestCreditInquiry(ctx) {
@@ -55,7 +56,7 @@ async function getLatestCreditInquiry(ctx) {
     error_msg = RetCode.ERRMSG_QUERY_FAILED;
   }
 
-  service_helper.genResponse(ctx, error_code, error_msg, data);
+  common_service_helper.genResponse(ctx, error_code, error_msg, data);
 }
 
 async function getCreditInquiryByHash(ctx) {
@@ -94,7 +95,7 @@ async function getCreditInquiryByHash(ctx) {
     error_msg = RetCode.ERRMSG_QUERY_FAILED;
   }
 
-  service_helper.genResponse(ctx, error_code, error_msg, data);
+  common_service_helper.genResponse(ctx, error_code, error_msg, data);
 }
 
 async function getCreditInquiryListByCond(ctx, cond) {
@@ -137,7 +138,7 @@ async function getCreditInquiryListByCond(ctx, cond) {
     error_msg = RetCode.ERRMSG_QUERY_FAILED;
   }
 
-  service_helper.genListResponse(ctx, error_code, error_msg, total_count, data);
+  common_service_helper.genListResponse(ctx, error_code, error_msg, total_count, data);
 
 }
 
@@ -195,7 +196,7 @@ async function getCountGroupByMoralCrisisType(ctx) {
     error_msg = RetCode.ERRMSG_QUERY_FAILED;
   }
 
-  service_helper.genResponse(ctx, error_code, error_msg, {'txs_count': txs_count});
+  common_service_helper.genResponse(ctx, error_code, error_msg, {'txs_count': txs_count});
 
 }
 
@@ -268,7 +269,7 @@ async function getCreditInquiryTxCountList(ctx) {
     error_msg = RetCode.ERRMSG_QUERY_FAILED;
   }
 
-  service_helper.genResponse(ctx, error_code, error_msg, {'txs_count': final_res});
+  common_service_helper.genResponse(ctx, error_code, error_msg, {'txs_count': final_res});
 
 }
 

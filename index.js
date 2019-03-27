@@ -8,6 +8,11 @@ const {
   BlockIndexStateModel,
 } = require('./models/block-index-state.model');
 
+const {
+  RewardRecordSchema,
+  RewardRecordModel,
+} = require('./models/reward-record.model');
+
 const States = require('./def/record-state');
 const RetCode = require('./def/ret-code');
 const ACIConfig = require('./config/config');
@@ -22,6 +27,8 @@ module.exports = {
   CreditInquiryModel,
   BlockIndexStateSchema,
   BlockIndexStateModel,
+  RewardRecordSchema,
+  RewardRecordModel,
   States,
   RetCode,
   ACIConfig,

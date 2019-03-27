@@ -29,7 +29,7 @@ try {
       type: String,
     },
     reward: {
-      type: Number,
+      type: String,
     },
     comments: {
       type: String,

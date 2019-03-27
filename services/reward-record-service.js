@@ -20,6 +20,7 @@ alphacar.db.connection.on('close', () => {
 
 const RewardRecordModel = alphacar.db.model('reward_record', RewardRecordSchema, 'reward_record');
 
+const common_service_helper = require('../utils/service_helper');
 const service_helper = require('../utils/rr_service_helper');
 
 async function getLatestRewardRecord(ctx) {
@@ -57,7 +58,7 @@ async function getLatestRewardRecord(ctx) {
     error_msg = RetCode.ERRMSG_QUERY_FAILED;
   }
 
-  service_helper.genResponse(ctx, error_code, error_msg, data);
+  common_service_helper.genResponse(ctx, error_code, error_msg, data);
 }
 
 async function getRewardRecordByHash(ctx) {
@@ -71,7 +72,9 @@ async function getRewardRecordByHash(ctx) {
     service_helper.make_mask(),
     {
       $sort: {
-        recordTime: -1
+        recordTime: -1,
+        activityType: -1,
+        ranking: 1,
       }
     },
     {
@@ -96,10 +99,12 @@ async function getRewardRecordByHash(ctx) {
     error_msg = RetCode.ERRMSG_QUERY_FAILED;
   }
 
-  service_helper.genResponse(ctx, error_code, error_msg, data);
+  common_service_helper.genResponse(ctx, error_code, error_msg, data);
 }
 
 async function getRewardRecordListByCond(ctx, cond) {
+  
+  console.log('getRewardRecordListByCond cond:', JSON.stringify(cond));
 
   let pipeline = [{
       $match: cond['cond']
@@ -107,7 +112,9 @@ async function getRewardRecordListByCond(ctx, cond) {
     service_helper.make_mask(),
     {
       $sort: {
-        recordTime: -1
+        recordTime: -1,
+        activityType: -1,
+        ranking: 1,
       }
     },
   ];
@@ -118,7 +125,6 @@ async function getRewardRecordListByCond(ctx, cond) {
     }, {
       $limit: cond['page_size']
     }]);
-    //console.log('pipeline:', pipeline);
   }
 
   let error_code = RetCode.RET_OK;
@@ -135,17 +141,18 @@ async function getRewardRecordListByCond(ctx, cond) {
     }
 
   } catch (err) {
+    console.log('getRewardRecordListByCond got err:', err);
     error_code = RetCode.RET_QUERY_FAILED;
     error_msg = RetCode.ERRMSG_QUERY_FAILED;
   }
 
-  service_helper.genListResponse(ctx, error_code, error_msg, total_count, data);
+  common_service_helper.genListResponse(ctx, error_code, error_msg, total_count, data);
 
 }
 
-async function getRewardRecordListByMoralCrisisType(ctx) {
+async function getRewardRecordListByActivityType(ctx) {
 
-  const cond = service_helper.gen_moral_crisis_cond(ctx);
+  const cond = service_helper.gen_activity_cond(ctx);
 
   await getRewardRecordListByCond(ctx, cond);
 
@@ -159,7 +166,7 @@ async function getRewardRecordList(ctx) {
 
 }
 
-async function getCountGroupByMoralCrisisType(ctx) {
+async function getCountGroupByActivityType(ctx) {
 
   let cond = [{
       '$match': {
@@ -169,7 +176,7 @@ async function getCountGroupByMoralCrisisType(ctx) {
       }
     }, {
       '$group': {
-        '_id': '$moralCrisisType',
+        '_id': '$activityType',
         'count': {
           '$sum': 1
         }
@@ -197,88 +204,14 @@ async function getCountGroupByMoralCrisisType(ctx) {
     error_msg = RetCode.ERRMSG_QUERY_FAILED;
   }
 
-  service_helper.genResponse(ctx, error_code, error_msg, {'txs_count': txs_count});
-
-}
-
-async function getRewardRecordTxCountList(ctx) {
-  let dates = ctx.request.body;
-  let date_arr = [];
-  for (var i = 0; i < dates.length; i++) {
-    date_arr.push({
-      '_id': dates[i]
-    })
-  }
-
-  let cond = [{
-      '$match': {
-        'status': {
-          $ne: States.STATE_DELETED
-        }
-      }
-    }, {
-      '$group': {
-        '_id': {
-          '$dateToString': {
-            'format': '%Y-%m-%d',
-            'date': '$recordTime',
-            'timezone': '+08:00'
-          }
-        },
-        'count': {
-          '$sum': 1
-        }
-      }
-    }, {
-      '$match': {
-        '$or': date_arr
-      }
-    },
-    {
-      '$sort': {
-        '_id': 1
-      }
-    },
-  ]
-
-  let error_code = RetCode.RET_OK;
-  let error_msg = RetCode.ERRMSG_EMPTY;
-  let final_res = [];
-
-  try {
-
-    let txs_count = await RewardRecordModel.aggregate(cond).exec();
-
-    let tmp = {};
-
-    for (var i = 0; i < txs_count.length; i++) {
-      tmp[txs_count[i]._id] = txs_count[i].count;
-    }
-
-    for (var i = 0; i < dates.length; i++) {
-      if (!tmp.hasOwnProperty(dates[i])) {
-        tmp[dates[i]] = 0;
-      }
-    }
-
-    for (var i = 0; i < dates.length; i++) {
-      final_res.push(tmp[dates[i]])
-    }
-
-  } catch (err) {
-    error_code = RetCode.RET_QUERY_FAILED;
-    error_msg = RetCode.ERRMSG_QUERY_FAILED;
-  }
-
-  service_helper.genResponse(ctx, error_code, error_msg, {'txs_count': final_res});
+  common_service_helper.genResponse(ctx, error_code, error_msg, {'txs_count': txs_count});
 
 }
 
 module.exports = {
   getLatestRewardRecord,
   getRewardRecordByHash,
-  getCountGroupByMoralCrisisType,
-  getRewardRecordListByMoralCrisisType,
+  getCountGroupByActivityType,
+  getRewardRecordListByActivityType,
   getRewardRecordList,
-  getRewardRecordTxCountList,
 }

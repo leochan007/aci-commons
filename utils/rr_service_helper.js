@@ -78,14 +78,14 @@ function make_mask() {
   }
 }
 
-function gen_moral_crisis_cond(ctx) {
+function gen_activity_cond(ctx) {
 
   const param = ctx.request.query;
-  const moral_crisis_type = param['moral_crisis_type']
+  const activity_type = param['activity_type']
   const page = parseInt(param['page'])
   const page_size = parseInt(param['page_size'])
 
-  return gen_cond('5', moral_crisis_type, page, page_size);
+  return gen_cond('6', activity_type, page, page_size);
 
 }
 
@@ -105,7 +105,7 @@ function gen_cond(search_type, search_txt, page, page_size) {
 
   let cond = {}
 
-  var opt_lst = ['1', '2', '3', '4', '5'];
+  var opt_lst = ['1', '2', '3', '4', '5', '6'];
 
   console.log('page:', page);
 
@@ -136,7 +136,7 @@ function gen_cond(search_type, search_txt, page, page_size) {
           'comments': search_txt
         },
         {
-          'reason': search_txt
+          'reward': search_txt
         },
         {
           'txId': search_txt
@@ -149,19 +149,23 @@ function gen_cond(search_type, search_txt, page, page_size) {
     }
   } else if (search_type === '2') {
     cond = {
-      'personId': search_txt
+      'name': search_txt
     }
   } else if (search_type === '3') {
     cond = {
-      'reason': search_txt
+      'comments': search_txt
     }
   } else if (search_type === '4') {
     cond = {
-      'txId': search_txt
+      'reward': search_txt
     }
   } else if (search_type === '5') {
     cond = {
-      'moralCrisisType': search_txt
+      'txId': search_txt
+    }
+  } else if (search_type === '6') {
+    cond = {
+      'activityType': search_txt
     }
   }
 
@@ -181,37 +185,8 @@ function gen_cond(search_type, search_txt, page, page_size) {
 
 }
 
-function genResponse(ctx, error_code, error_msg, data) {
-
-  let body = {
-    'error_code': error_code,
-    'error_msg': error_msg,
-    'data': data,
-  }
-
-  ctx.response.body = body
-
-}
-
-function genListResponse(ctx, error_code, error_msg, total_count, data) {
-
-  let body = {
-    'error_code': error_code,
-    'error_msg': error_msg,
-    data: {
-      'total_count': total_count,
-      'lst': data
-    }
-  }
-
-  ctx.response.body = body
-
-}
-
 module.exports = {
   make_mask,
-  gen_moral_crisis_cond,
+  gen_activity_cond,
   gen_search_cond,
-  genResponse,
-  genListResponse,
 }
