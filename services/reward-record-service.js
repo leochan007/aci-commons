@@ -5,7 +5,9 @@ const {
 const States = require('../def/record-state');
 const RetCode = require('../def/ret-code');
 
-const { MongoDb } = require('../utils/mongo_helper');
+const {
+  MongoDb
+} = require('../utils/mongo_helper');
 
 const alphacar = new MongoDb('alphacar');
 
@@ -103,7 +105,7 @@ async function getRewardRecordByHash(ctx) {
 }
 
 async function getRewardRecordListByCond(ctx, cond) {
-  
+
   console.log('getRewardRecordListByCond cond:', JSON.stringify(cond));
 
   let pipeline = [{
@@ -166,7 +168,66 @@ async function getRewardRecordList(ctx) {
 
 }
 
-async function getCountGroupByActivityType(ctx) {
+async function getRewardRecordGroupByActivityType(ctx) {
+  const param = ctx.request.query;
+  const activity_type = param['activity_type'];
+
+  let cond = [
+    {
+      '$match': {
+        '$and': [
+          {
+            'status': {
+              '$ne': States.STATE_DELETED
+            }
+          },
+          {
+            'activityType': activity_type
+          }
+        ]
+      }
+    }, 
+    service_helper.make_mask(),
+    {
+      '$sort': {
+        'ranking': 1
+      }
+    },
+    {
+      '$group': {
+        '_id': '$issueNumber',
+        'data': { $push: { '_id': "$hash", name: "$name", ranking: "$ranking" }}
+      }
+    },
+    {
+      '$sort': {
+        '_id': 1
+      }
+    },
+  ]
+
+  let error_code = RetCode.RET_OK;
+  let error_msg = RetCode.ERRMSG_EMPTY;
+  let txs_count = [];
+
+  try {
+
+    txs_count = await RewardRecordModel.aggregate(cond).exec();
+
+  } catch (err) {
+    console.log(err);
+    error_code = RetCode.RET_QUERY_FAILED;
+    error_msg = RetCode.ERRMSG_QUERY_FAILED;
+  }
+
+  common_service_helper.genResponse(ctx, error_code, error_msg, {
+    'txs_count': txs_count
+  });
+
+}
+
+//ByActivityType
+async function getRewardRecordGroup(ctx) {
 
   let cond = [{
       '$match': {
@@ -204,14 +265,17 @@ async function getCountGroupByActivityType(ctx) {
     error_msg = RetCode.ERRMSG_QUERY_FAILED;
   }
 
-  common_service_helper.genResponse(ctx, error_code, error_msg, {'txs_count': txs_count});
+  common_service_helper.genResponse(ctx, error_code, error_msg, {
+    'txs_count': txs_count
+  });
 
 }
 
 module.exports = {
   getLatestRewardRecord,
   getRewardRecordByHash,
-  getCountGroupByActivityType,
+  getRewardRecordGroupByActivityType,
+  getRewardRecordGroup,
   getRewardRecordListByActivityType,
   getRewardRecordList,
 }
